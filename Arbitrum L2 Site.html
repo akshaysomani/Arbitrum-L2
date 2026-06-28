@@ -1,0 +1,1674 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arbitrum L2 — Build Faster on Ethereum</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            display: ['"Space Grotesk"', 'Inter', 'ui-sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            ink: {
+              950: '#070B14',
+              900: '#0B1120',
+              800: '#0F172A',
+              700: '#1E293B',
+            },
+            arb: {
+              400: '#60C4FF',
+              500: '#28A0F0',   // Arbitrum signature blue
+              600: '#1B7FCC',
+            },
+            cyan2: {
+              400: '#22D3EE',
+              500: '#06B6D4',
+            },
+          },
+          boxShadow: {
+            glow: '0 0 0 1px rgba(40,160,240,0.25), 0 20px 60px -20px rgba(40,160,240,0.35)',
+            glowCyan: '0 0 0 1px rgba(34,211,238,0.25), 0 20px 60px -20px rgba(34,211,238,0.35)',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    html,
+    body {
+      background: #070B14;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #E2E8F0;
+      background:
+        radial-gradient(900px 600px at 85% -10%, rgba(40, 160, 240, 0.18), transparent 60%),
+        radial-gradient(800px 600px at 5% 20%, rgba(34, 211, 238, 0.10), transparent 60%),
+        radial-gradient(700px 500px at 50% 110%, rgba(40, 160, 240, 0.10), transparent 60%),
+        #070B14;
+      min-height: 100vh;
+    }
+
+    /* subtle grid */
+    .bg-grid {
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 40%, transparent 90%);
+    }
+
+    .font-display {
+      font-family: 'Space Grotesk', Inter, sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    /* Glass */
+    .glass {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .glass-strong {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      backdrop-filter: blur(18px);
+    }
+
+    /* Gradient text */
+    .grad-text {
+      background: linear-gradient(90deg, #60C4FF 0%, #22D3EE 60%, #A5F3FC 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* Card hover */
+    .card-hover {
+      transition: transform .35s cubic-bezier(.2, .7, .2, 1), box-shadow .35s, border-color .35s;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-4px);
+      border-color: rgba(34, 211, 238, 0.45);
+      box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2), 0 30px 60px -25px rgba(34, 211, 238, 0.35);
+    }
+
+    /* Fade up entrance */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .reveal {
+      opacity: 0;
+    }
+
+    .reveal.in {
+      animation: fadeUp .7s cubic-bezier(.2, .7, .2, 1) forwards;
+    }
+
+    /* Floating cube anim */
+    @keyframes floatY {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-14px) rotate(2deg);
+      }
+    }
+
+    @keyframes floatY2 {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-22px) rotate(-3deg);
+      }
+    }
+
+    @keyframes spinSlow {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        opacity: .55;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -200;
+      }
+    }
+
+    /* nav active */
+    .nav-link {
+      position: relative;
+      transition: color .2s;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -6px;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #28A0F0, #22D3EE);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform .3s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .nav-link.active {
+      color: #fff;
+    }
+
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link:hover {
+      color: #fff;
+    }
+
+    /* spinner */
+    @keyframes spinFast {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      border-top-color: #22D3EE;
+      animation: spinFast 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    /* page transitions */
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-anim {
+      animation: pageIn .45s cubic-bezier(.2, .7, .2, 1) both;
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1f2a44;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2a3a5e;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* Hash truncation */
+    .hash-mono {
+      font-family: 'JetBrains Mono', monospace;
+      word-break: break-all;
+    }
+
+    /* button shine */
+    .btn-primary {
+      position: relative;
+      background: linear-gradient(135deg, #28A0F0 0%, #06B6D4 100%);
+      box-shadow: 0 10px 30px -10px rgba(40, 160, 240, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: transform .2s, box-shadow .25s, filter .2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 14px 36px -10px rgba(40, 160, 240, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      transition: all .2s;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(34, 211, 238, 0.5);
+    }
+
+    /* connector arrow dashed line */
+    .chain-line {
+      stroke-dasharray: 6 6;
+      animation: dash 2.5s linear infinite;
+    }
+  </style>
+
+  <!-- React + Babel -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+    integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+    integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+    integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+    crossorigin="anonymous"></script>
+
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+
+<body>
+
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="env,react">
+    const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+    /* ============================================================
+       ICON HELPER (Lucide)
+       ============================================================ */
+    function toPascal(name) {
+      return name.split('-').map(s => s ? s[0].toUpperCase() + s.slice(1) : '').join('');
+    }
+    function Icon({ name, size = 18, className = '', strokeWidth = 1.75, style }) {
+      const ref = useRef(null);
+      useEffect(() => {
+        if (!ref.current || !window.lucide) return;
+        ref.current.innerHTML = '';
+        const icons = window.lucide.icons;
+        const key = icons[toPascal(name)] ? toPascal(name) : (icons[name] ? name : 'Circle');
+        const node = window.lucide.createElement(icons[key]);
+        if (node instanceof Element) {
+          node.setAttribute('width', size);
+          node.setAttribute('height', size);
+          node.setAttribute('stroke-width', strokeWidth);
+          ref.current.appendChild(node);
+        }
+      }, [name, size, strokeWidth]);
+      return <span ref={ref} className={`inline-flex items-center justify-center ${className}`} style={style} aria-hidden="true" />;
+    }
+
+    /* ============================================================
+       ROUTER (hash-based)
+       ============================================================ */
+    function useHashRoute() {
+      const get = () => {
+        const h = window.location.hash.replace(/^#\/?/, '');
+        return h || 'home';
+      };
+      const [route, setRoute] = useState(get());
+      useEffect(() => {
+        const handler = () => { setRoute(get()); window.scrollTo({ top: 0, behavior: 'instant' }); };
+        window.addEventListener('hashchange', handler);
+        return () => window.removeEventListener('hashchange', handler);
+      }, []);
+      return route;
+    }
+
+    const navigate = (path) => { window.location.hash = '#/' + path; };
+
+    /* ============================================================
+       REVEAL ON SCROLL
+       ============================================================ */
+    function Reveal({ children, delay = 0, className = '' }) {
+      const ref = useRef(null);
+      useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        // Safety fallback: always reveal after 600ms regardless of viewport state
+        const fallback = setTimeout(() => el.classList.add('in'), 600 + delay);
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(e => {
+            if (e.isIntersecting) {
+              setTimeout(() => el.classList.add('in'), delay);
+              io.unobserve(el);
+            }
+          });
+        }, { threshold: 0.05, rootMargin: '0px 0px -5% 0px' });
+        io.observe(el);
+        return () => { io.disconnect(); clearTimeout(fallback); };
+      }, [delay]);
+      return <div ref={ref} className={`reveal ${className}`}>{children}</div>;
+    }
+
+    /* ============================================================
+       PRIMITIVES
+       ============================================================ */
+    function Button({ children, variant = 'primary', onClick, href, icon, className = '' }) {
+      const base = "inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-medium text-sm transition whitespace-nowrap";
+      const cls = variant === 'primary' ? 'btn-primary text-white' : 'btn-ghost text-white/90';
+      const content = (
+        <>
+          {children}
+          {icon && <Icon name={icon} size={16} />}
+        </>
+      );
+      if (href) {
+        return <a href={href} target="_blank" rel="noopener" className={`${base} ${cls} ${className}`}>{content}</a>;
+      }
+      return <button onClick={onClick} className={`${base} ${cls} ${className}`}>{content}</button>;
+    }
+
+    function SectionTitle({ eyebrow, title, subtitle, center = false }) {
+      return (
+        <div className={`max-w-2xl ${center ? 'mx-auto text-center' : ''} mb-12`}>
+          {eyebrow && (
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-mono uppercase tracking-widest text-cyan2-400 mb-4 ${center ? '' : ''}`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan2-400" style={{ boxShadow: '0 0 12px #22D3EE' }}></span>
+              {eyebrow}
+            </div>
+          )}
+          <h2 className="font-display text-3xl md:text-5xl font-semibold text-white leading-tight">
+            {title}
+          </h2>
+          {subtitle && <p className="mt-4 text-slate-400 text-base md:text-lg leading-relaxed">{subtitle}</p>}
+        </div>
+      );
+    }
+
+    function LoadingSpinner({ label = 'Loading' }) {
+      return (
+        <div className="flex items-center gap-3 text-slate-300">
+          <span className="spinner" />
+          <span className="text-sm font-mono">{label}…</span>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       NAVBAR
+       ============================================================ */
+    const NAV_ITEMS = [
+      { key: 'home', label: 'Home' },
+      { key: 'concepts', label: 'Concepts' },
+      { key: 'prices', label: 'Live Prices' },
+      { key: 'simulator', label: 'Block Simulator' },
+    ];
+
+    function Navbar({ route }) {
+      const [open, setOpen] = useState(false);
+      return (
+        <header className="sticky top-0 z-50">
+          <div className="absolute inset-0 backdrop-blur-xl bg-ink-950/70 border-b border-white/5"></div>
+          <nav className="relative max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+            <a href="#/home" className="flex items-center gap-2.5 group">
+              <span className="relative w-9 h-9 rounded-lg overflow-hidden grid place-items-center"
+                style={{ background: 'linear-gradient(135deg,#28A0F0,#06B6D4)' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2 3 7v10l9 5 9-5V7z" />
+                  <path d="M12 22V12" />
+                  <path d="m3 7 9 5 9-5" />
+                </svg>
+              </span>
+              <div className="leading-tight">
+                <div className="font-display font-semibold text-white text-[15px]">Arbitrum L2</div>
+                <div className="text-[10px] font-mono uppercase tracking-widest text-cyan2-400">Overview</div>
+              </div>
+            </a>
+
+            <div className="hidden md:flex items-center gap-1">
+              {NAV_ITEMS.map(item => (
+                <a key={item.key}
+                  href={`#/${item.key}`}
+                  className={`nav-link px-3 py-2 text-sm text-slate-300 ${route === item.key ? 'active' : ''}`}>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+
+            <div className="hidden md:flex items-center gap-2">
+              <Button variant="ghost" onClick={() => navigate('simulator')} icon="arrow-right">Try Simulator</Button>
+            </div>
+
+            <button className="md:hidden p-2 text-white" onClick={() => setOpen(v => !v)} aria-label="menu">
+              <Icon name={open ? 'x' : 'menu'} size={22} />
+            </button>
+          </nav>
+
+          {open && (
+            <div className="md:hidden relative bg-ink-950/95 border-b border-white/5 px-5 py-3 space-y-1">
+              {NAV_ITEMS.map(item => (
+                <a key={item.key} href={`#/${item.key}`} onClick={() => setOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-sm ${route === item.key ? 'bg-white/5 text-white' : 'text-slate-300'}`}>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </header>
+      );
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    function Footer() {
+      return (
+        <footer className="relative mt-24 border-t border-white/5">
+          <div className="max-w-7xl mx-auto px-5 md:px-8 py-12 grid md:grid-cols-3 gap-10">
+            <div>
+              <div className="flex items-center gap-2.5 mb-4">
+                <span className="w-8 h-8 rounded-lg grid place-items-center" style={{ background: 'linear-gradient(135deg,#28A0F0,#06B6D4)' }}>
+                  <Icon name="box" size={16} />
+                </span>
+                <span className="font-display font-semibold text-white">Arbitrum L2 Overview</span>
+              </div>
+              <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
+                A learning project exploring Ethereum scalability, rollups, and on-chain immutability.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-[11px] font-mono uppercase tracking-widest text-slate-500 mb-3">Builder</div>
+              <div className="space-y-2 text-sm">
+                <div className="text-white font-medium">Your Name</div>
+                <a className="flex items-center gap-2 text-slate-400 hover:text-cyan2-400 transition" href="https://github.com/akshaysomani" target="_blank" rel="noopener">
+                  <Icon name="github" size={14} /> github.com/akshaysomani
+                </a>
+                <div className="text-slate-400">Builder Labs · Batch 04</div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-[11px] font-mono uppercase tracking-widest text-slate-500 mb-3">Explore</div>
+              <div className="flex flex-col gap-2 text-sm">
+                {NAV_ITEMS.map(n => (
+                  <a key={n.key} href={`#/${n.key}`} className="text-slate-400 hover:text-white transition">{n.label}</a>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-white/5">
+            <div className="max-w-7xl mx-auto px-5 md:px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+              <div>© 2026 Arbitrum L2 Overview · Built with React + Tailwind</div>
+              <div className="font-mono">v1.0.0 — Built on Ethereum</div>
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    /* ============================================================
+       ANIMATED BLOCKCHAIN ILLUSTRATION
+       ============================================================ */
+    function ChainIllustration() {
+      return (
+        <div className="relative w-full aspect-square max-w-[520px] mx-auto">
+          {/* glow */}
+          <div className="absolute inset-10 rounded-full opacity-50"
+            style={{
+              background: 'radial-gradient(circle, rgba(34,211,238,0.35), transparent 60%)',
+              filter: 'blur(20px)',
+              animation: 'pulseGlow 4s ease-in-out infinite',
+            }} />
+          {/* orbit ring */}
+          <svg viewBox="0 0 400 400" className="absolute inset-0 w-full h-full" style={{ animation: 'spinSlow 60s linear infinite' }}>
+            <defs>
+              <linearGradient id="ringGrad" x1="0" x2="1">
+                <stop offset="0%" stopColor="#28A0F0" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#22D3EE" stopOpacity="0.2" />
+              </linearGradient>
+            </defs>
+            <circle cx="200" cy="200" r="170" fill="none" stroke="url(#ringGrad)" strokeWidth="1" strokeDasharray="4 8" />
+            <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(148,163,184,0.15)" strokeWidth="1" />
+            <circle cx="200" cy="200" r="110" fill="none" stroke="rgba(148,163,184,0.1)" strokeWidth="1" />
+          </svg>
+
+          {/* center cube cluster */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative w-48 h-48">
+              {/* L1 cube (back) */}
+              <Cube3D
+                className="absolute top-0 left-1/2 -translate-x-1/2"
+                size={88}
+                label="L1"
+                sublabel="ETHEREUM"
+                colors={['#1E293B', '#0F172A']}
+                style={{ animation: 'floatY 6s ease-in-out infinite' }}
+              />
+              {/* L2 cube (front) */}
+              <Cube3D
+                className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                size={110}
+                label="L2"
+                sublabel="ARBITRUM"
+                colors={['#28A0F0', '#06B6D4']}
+                style={{ animation: 'floatY2 7s ease-in-out infinite' }}
+              />
+            </div>
+          </div>
+
+          {/* satellite cubes */}
+          {[
+            { top: '8%', left: '12%', d: 0, s: 36, c: ['#22D3EE', '#0EA5E9'] },
+            { top: '18%', right: '8%', d: 1.5, s: 28, c: ['#60C4FF', '#28A0F0'] },
+            { bottom: '14%', left: '6%', d: 2.5, s: 32, c: ['#06B6D4', '#0891B2'] },
+            { bottom: '8%', right: '14%', d: 1, s: 26, c: ['#28A0F0', '#1B7FCC'] },
+          ].map((p, i) => (
+            <div key={i} className="absolute" style={{ top: p.top, left: p.left, right: p.right, bottom: p.bottom, animation: `floatY ${5 + p.d}s ease-in-out infinite`, animationDelay: `${p.d}s` }}>
+              <MiniCube size={p.s} colors={p.c} />
+            </div>
+          ))}
+
+          {/* dotted connector L1->L2 */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 400">
+            <line x1="200" y1="170" x2="200" y2="230" stroke="#22D3EE" strokeWidth="2" strokeDasharray="3 5" className="chain-line" />
+          </svg>
+        </div>
+      );
+    }
+
+    function Cube3D({ size = 80, label, sublabel, colors = ['#28A0F0', '#06B6D4'], className = '', style }) {
+      return (
+        <div className={`relative ${className}`} style={{ width: size, height: size, ...style }}>
+          <div className="absolute inset-0 rounded-2xl"
+            style={{
+              background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`,
+              boxShadow: `0 20px 50px -10px ${colors[0]}88, inset 0 1px 0 rgba(255,255,255,0.25)`,
+            }} />
+          {/* gloss */}
+          <div className="absolute inset-0 rounded-2xl opacity-50"
+            style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.25), transparent 50%)' }} />
+          <div className="absolute inset-0 grid place-items-center text-center">
+            <div>
+              <div className="font-display font-bold text-white text-2xl leading-none">{label}</div>
+              {sublabel && <div className="font-mono text-[9px] tracking-widest text-white/80 mt-1">{sublabel}</div>}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    function MiniCube({ size = 32, colors }) {
+      return (
+        <div className="rounded-lg"
+          style={{
+            width: size, height: size,
+            background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`,
+            boxShadow: `0 10px 30px -10px ${colors[0]}aa, inset 0 1px 0 rgba(255,255,255,0.3)`,
+          }} />
+      );
+    }
+
+    /* ============================================================
+       PAGE 1 — HOME
+       ============================================================ */
+    function HomePage() {
+      return (
+        <div className="page-anim">
+          {/* HERO */}
+          <section className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-grid opacity-60 pointer-events-none"></div>
+            <div className="relative max-w-7xl mx-auto px-5 md:px-8 pt-20 pb-24 grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-mono uppercase tracking-widest text-cyan2-400 mb-6">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan2-400" style={{ boxShadow: '0 0 12px #22D3EE' }}></span>
+                  Ethereum · Layer 2 · Rollup
+                </div>
+                <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold text-white leading-[1.05] tracking-tight">
+                  Build faster on Ethereum with <span className="grad-text">Arbitrum</span>.
+                </h1>
+                <p className="mt-6 text-slate-400 text-lg leading-relaxed max-w-xl">
+                  Ethereum is the most secure smart-contract platform on earth — but at peak demand, it's expensive and slow.
+                  Arbitrum is a Layer 2 rollup that processes transactions off-chain and inherits Ethereum's security,
+                  giving you the same trust at a fraction of the cost.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Button onClick={() => navigate('concepts')} icon="book-open">Learn Concepts</Button>
+                  <Button variant="ghost" onClick={() => navigate('prices')} icon="trending-up">Live Prices</Button>
+                </div>
+
+                <div className="mt-12 grid grid-cols-3 gap-6 max-w-md">
+                  {[
+                    { v: '~$0.10', l: 'Avg L2 fee' },
+                    { v: '40k+', l: 'TPS theoretical' },
+                    { v: '1', l: 'Ethereum security' },
+                  ].map((s, i) => (
+                    <div key={i}>
+                      <div className="font-display text-2xl md:text-3xl font-semibold text-white">{s.v}</div>
+                      <div className="text-xs text-slate-500 mt-1">{s.l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative">
+                <ChainIllustration />
+              </div>
+            </div>
+          </section>
+
+          {/* WHY L2 */}
+          <section className="relative max-w-7xl mx-auto px-5 md:px-8 py-20">
+            <Reveal>
+              <SectionTitle
+                eyebrow="The Problem"
+                title="Why Ethereum needed Layer 2"
+                subtitle="As Ethereum became the home of DeFi and NFTs, its base layer hit real-world limits. Three pain points pushed the ecosystem to scale."
+              />
+            </Reveal>
+
+            <div className="grid md:grid-cols-3 gap-5">
+              {[
+                { icon: 'flame', title: 'High Gas Fees', text: 'Simple swaps could cost $50+ during peak hours. Pricing out small users and breaking on-chain UX.', accent: '#F97316' },
+                { icon: 'network', title: 'Network Congestion', text: 'A single popular mint or trade clogs the mempool. Pending transactions stack up for hours.', accent: '#28A0F0' },
+                { icon: 'clock', title: 'Slow Transactions', text: '~12-second blocks and limited throughput make Ethereum feel like dial-up when demand spikes.', accent: '#22D3EE' },
+              ].map((c, i) => (
+                <Reveal key={i} delay={i * 80}>
+                  <div className="glass card-hover rounded-2xl p-7 h-full">
+                    <div className="w-11 h-11 rounded-xl grid place-items-center mb-5"
+                      style={{ background: `${c.accent}15`, border: `1px solid ${c.accent}44`, color: c.accent }}>
+                      <Icon name={c.icon} size={20} />
+                    </div>
+                    <h3 className="font-display text-xl font-semibold text-white mb-2">{c.title}</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">{c.text}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </section>
+
+          {/* WHAT IS ARBITRUM */}
+          <section className="relative max-w-7xl mx-auto px-5 md:px-8 py-20">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <Reveal>
+                <SectionTitle
+                  eyebrow="The Solution"
+                  title="What is Arbitrum?"
+                  subtitle="Arbitrum is an optimistic rollup. It batches thousands of transactions off-chain, executes them in its own environment, and posts compressed proofs back to Ethereum."
+                />
+                <ul className="space-y-3 text-slate-300">
+                  {[
+                    ['Layer 2 rollup', 'Sits on top of Ethereum mainnet'],
+                    ['Off-chain execution', 'Transactions run on Arbitrum nodes, not L1'],
+                    ['Proofs posted to L1', 'Ethereum verifies and finalizes state'],
+                    ['Inherits L1 security', 'Same trust assumptions as Ethereum itself'],
+                  ].map((row, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="mt-1 w-5 h-5 rounded-full grid place-items-center flex-shrink-0"
+                        style={{ background: 'linear-gradient(135deg,#28A0F0,#06B6D4)' }}>
+                        <Icon name="check" size={12} />
+                      </span>
+                      <div>
+                        <div className="text-white font-medium">{row[0]}</div>
+                        <div className="text-slate-400 text-sm">{row[1]}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+
+              <Reveal delay={120}>
+                <RollupDiagram />
+              </Reveal>
+            </div>
+          </section>
+
+          {/* BENEFITS */}
+          <section className="relative max-w-7xl mx-auto px-5 md:px-8 py-20">
+            <Reveal>
+              <SectionTitle
+                eyebrow="Benefits"
+                title="Same security. Better experience."
+                subtitle="Arbitrum gives developers and users the four things Ethereum couldn't deliver alone at scale."
+                center
+              />
+            </Reveal>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                { icon: 'dollar-sign', title: 'Low Fees', text: 'Transactions for cents, not dollars. Real on-chain UX for everyone.' },
+                { icon: 'zap', title: 'Fast Transactions', text: 'Near-instant confirmations on L2. No more pending purgatory.' },
+                { icon: 'shield-check', title: 'Ethereum Security', text: 'Settles to Ethereum. Same trust, same finality, lower cost.' },
+                { icon: 'code-2', title: 'EVM Compatible', text: 'Deploy your existing Solidity contracts unchanged. Tools just work.' },
+              ].map((b, i) => (
+                <Reveal key={i} delay={i * 80}>
+                  <div className="glass card-hover rounded-2xl p-6 h-full">
+                    <div className="w-10 h-10 rounded-xl grid place-items-center mb-4"
+                      style={{ background: 'linear-gradient(135deg, rgba(40,160,240,0.2), rgba(34,211,238,0.2))', border: '1px solid rgba(34,211,238,0.3)' }}>
+                      <Icon name={b.icon} size={18} className="text-cyan2-400" />
+                    </div>
+                    <h3 className="font-display text-lg font-semibold text-white mb-2">{b.title}</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">{b.text}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </section>
+
+          {/* CTA STRIP */}
+          <section className="relative max-w-7xl mx-auto px-5 md:px-8 py-12">
+            <div className="glass-strong rounded-3xl p-8 md:p-12 overflow-hidden relative">
+              <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full opacity-30"
+                style={{ background: 'radial-gradient(circle, #22D3EE, transparent 60%)' }} />
+              <div className="relative grid md:grid-cols-2 gap-6 items-center">
+                <div>
+                  <h3 className="font-display text-2xl md:text-3xl font-semibold text-white">Ready to explore?</h3>
+                  <p className="text-slate-400 mt-2">Walk through the core Web3 concepts, watch live crypto prices, then mine your own block.</p>
+                </div>
+                <div className="flex flex-wrap gap-3 md:justify-end">
+                  <Button onClick={() => navigate('concepts')} icon="arrow-right">Open Concepts</Button>
+                  <Button variant="ghost" onClick={() => navigate('simulator')} icon="cpu">Mine a Block</Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    function RollupDiagram() {
+      return (
+        <div className="glass rounded-3xl p-6 md:p-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-grid opacity-40 pointer-events-none"></div>
+          <div className="relative">
+            {/* L2 batch */}
+            <div className="mb-6">
+              <div className="text-[11px] font-mono uppercase tracking-widest text-cyan2-400 mb-3">Layer 2 · Arbitrum</div>
+              <div className="rounded-2xl p-4 border border-cyan2-500/30"
+                style={{ background: 'linear-gradient(135deg, rgba(40,160,240,0.1), rgba(34,211,238,0.05))' }}>
+                <div className="grid grid-cols-6 gap-1.5 mb-3">
+                  {Array.from({ length: 18 }).map((_, i) => (
+                    <div key={i} className="aspect-square rounded"
+                      style={{ background: `linear-gradient(135deg, rgba(40,160,240,${0.3 + Math.random() * 0.5}), rgba(34,211,238,${0.2 + Math.random() * 0.5}))` }} />
+                  ))}
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-mono">18 txs · batched off-chain</span>
+                  <span className="text-cyan2-400 font-mono">~$0.08 each</span>
+                </div>
+              </div>
+            </div>
+
+            {/* arrow */}
+            <div className="flex flex-col items-center my-2">
+              <svg width="40" height="48" viewBox="0 0 40 48">
+                <line x1="20" y1="0" x2="20" y2="40" stroke="#22D3EE" strokeWidth="2" strokeDasharray="3 4" className="chain-line" />
+                <path d="M20 40 L14 32 M20 40 L26 32" stroke="#22D3EE" strokeWidth="2" fill="none" strokeLinecap="round" />
+              </svg>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">Compressed proof posted</span>
+            </div>
+
+            {/* L1 */}
+            <div>
+              <div className="text-[11px] font-mono uppercase tracking-widest text-slate-400 mb-3">Layer 1 · Ethereum</div>
+              <div className="rounded-2xl p-4 border border-white/10 bg-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg grid place-items-center"
+                    style={{ background: 'linear-gradient(135deg, #475569, #1E293B)' }}>
+                    <Icon name="shield" size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-white text-sm font-medium">1 proof transaction</div>
+                    <div className="text-slate-500 text-xs font-mono">Verified · finalized · immutable</div>
+                  </div>
+                  <div className="font-mono text-xs text-slate-300">Block #19,824,113</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       PAGE 2 — CONCEPTS
+       ============================================================ */
+    function ConceptsPage() {
+      return (
+        <div className="page-anim">
+          <section className="max-w-7xl mx-auto px-5 md:px-8 pt-16 pb-12">
+            <Reveal>
+              <SectionTitle
+                eyebrow="Concepts"
+                title="The Web3 mental model."
+                subtitle="Four side-by-side comparisons that explain how Web3 differs from what came before."
+              />
+            </Reveal>
+          </section>
+
+          <section className="max-w-7xl mx-auto px-5 md:px-8 pb-8 grid lg:grid-cols-2 gap-6">
+            <Reveal>
+              <ComparisonCard
+                title="Web2 vs Web3"
+                icon="globe"
+                leftLabel="Web2"
+                rightLabel="Web3"
+                rows={[
+                  ['Ownership', 'Platforms own data', 'Users own assets'],
+                  ['Data', 'Stored on company servers', 'Stored on-chain / decentralized'],
+                  ['Authentication', 'Email + password', 'Cryptographic wallet'],
+                  ['Payments', 'Banks, Stripe, PayPal', 'Native crypto, peer-to-peer'],
+                  ['Transparency', 'Closed, opaque', 'Open, verifiable ledger'],
+                  ['Control', 'Centralized companies', 'Decentralized protocols'],
+                ]}
+              />
+            </Reveal>
+
+            <Reveal delay={100}>
+              <ComparisonCard
+                title="Ethereum vs Bitcoin"
+                icon="git-compare-arrows"
+                leftLabel="Bitcoin"
+                rightLabel="Ethereum"
+                rows={[
+                  ['Purpose', 'Digital gold, store of value', 'Programmable world computer'],
+                  ['Speed', '~10 min block time', '~12 sec block time'],
+                  ['Smart Contracts', 'Limited scripting', 'Turing-complete EVM'],
+                  ['Consensus', 'Proof of Work', 'Proof of Stake'],
+                  ['Supply', '21M hard cap', 'No fixed cap'],
+                  ['Use Cases', 'Payments, savings', 'DeFi, NFTs, DAOs, L2s'],
+                ]}
+              />
+            </Reveal>
+
+            <Reveal delay={150}>
+              <KeysCard />
+            </Reveal>
+
+            <Reveal delay={200}>
+              <ComparisonCard
+                title="Blockchain vs Traditional Database"
+                icon="database"
+                leftLabel="Database"
+                rightLabel="Blockchain"
+                rows={[
+                  ['Immutability', 'Records can be edited', 'Append-only, tamper-evident'],
+                  ['Centralization', 'One operator controls', 'Distributed across nodes'],
+                  ['Transparency', 'Private to operator', 'Publicly auditable'],
+                  ['Performance', 'High throughput', 'Lower throughput, higher trust'],
+                  ['Security', 'Trust the operator', 'Trust math + consensus'],
+                  ['Ownership', 'Company owns data', 'Users own their state'],
+                ]}
+              />
+            </Reveal>
+          </section>
+        </div>
+      );
+    }
+
+    function ComparisonCard({ title, icon, leftLabel, rightLabel, rows }) {
+      return (
+        <div className="glass card-hover rounded-2xl p-6 md:p-7 h-full">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl grid place-items-center"
+                style={{ background: 'linear-gradient(135deg, rgba(40,160,240,0.18), rgba(34,211,238,0.18))', border: '1px solid rgba(34,211,238,0.3)' }}>
+                <Icon name={icon} size={18} className="text-cyan2-400" />
+              </div>
+              <h3 className="font-display text-xl font-semibold text-white">{title}</h3>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 text-sm">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">Aspect</div>
+            <div className="text-[10px] font-mono uppercase tracking-widest text-slate-400 pb-2 border-b border-white/10 pl-3">{leftLabel}</div>
+            <div className="text-[10px] font-mono uppercase tracking-widest text-cyan2-400 pb-2 border-b border-white/10 pl-3">{rightLabel}</div>
+
+            {rows.map((r, i) => (
+              <React.Fragment key={i}>
+                <div className="py-3 text-white font-medium border-b border-white/5">{r[0]}</div>
+                <div className="py-3 text-slate-400 pl-3 border-b border-white/5">{r[1]}</div>
+                <div className="py-3 text-slate-200 pl-3 border-b border-white/5">{r[2]}</div>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function KeysCard() {
+      return (
+        <div className="glass card-hover rounded-2xl p-6 md:p-7 h-full">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-xl grid place-items-center"
+              style={{ background: 'linear-gradient(135deg, rgba(40,160,240,0.18), rgba(34,211,238,0.18))', border: '1px solid rgba(34,211,238,0.3)' }}>
+              <Icon name="key-round" size={18} className="text-cyan2-400" />
+            </div>
+            <h3 className="font-display text-xl font-semibold text-white">Public Key vs Private Key</h3>
+          </div>
+
+          <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+            Every wallet has two paired keys. One is your address — share it freely. The other signs transactions — never share it.
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-4 mb-6">
+            <KeyTile
+              icon="unlock"
+              variant="public"
+              title="Public Key"
+              sub="Share freely"
+              desc="Derived address that others use to send you funds. Visible on-chain."
+              example="0xA1f9…E27b"
+            />
+            <KeyTile
+              icon="lock"
+              variant="private"
+              title="Private Key"
+              sub="Never share"
+              desc="Secret used to sign transactions. Whoever holds it controls the wallet."
+              example="0x4c••••••••••3a"
+            />
+          </div>
+
+          <div className="rounded-xl p-4 border border-white/10 bg-white/[0.03] text-sm text-slate-300">
+            <span className="font-mono text-[11px] uppercase tracking-widest text-cyan2-400 mr-2">Rule</span>
+            Not your keys, not your coins.
+          </div>
+        </div>
+      );
+    }
+    function KeyTile({ icon, variant, title, sub, desc, example }) {
+      const accent = variant === 'private' ? '#F97316' : '#22D3EE';
+      return (
+        <div className="rounded-xl p-5 border" style={{ background: `${accent}0d`, borderColor: `${accent}33` }}>
+          <div className="w-10 h-10 rounded-lg grid place-items-center mb-3"
+            style={{ background: `${accent}1f`, color: accent, border: `1px solid ${accent}55` }}>
+            <Icon name={icon} size={18} />
+          </div>
+          <div className="flex items-baseline gap-2 mb-1">
+            <div className="text-white font-semibold">{title}</div>
+            <div className="text-[10px] font-mono uppercase tracking-widest" style={{ color: accent }}>{sub}</div>
+          </div>
+          <p className="text-slate-400 text-xs leading-relaxed mb-3">{desc}</p>
+          <div className="font-mono text-xs text-slate-300 truncate">{example}</div>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       PAGE 3 — LIVE PRICES
+       ============================================================ */
+    const COINS = [
+      {
+        id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin', color: '#F7931A',
+        logo: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png'
+      },
+      {
+        id: 'ethereum', symbol: 'ETH', name: 'Ethereum', color: '#627EEA',
+        logo: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png'
+      },
+      {
+        id: 'arbitrum', symbol: 'ARB', name: 'Arbitrum', color: '#28A0F0',
+        logo: 'https://assets.coingecko.com/coins/images/16547/large/photo_2023-03-29_21.47.00.jpeg'
+      },
+      {
+        id: 'solana', symbol: 'SOL', name: 'Solana', color: '#9945FF',
+        logo: 'https://assets.coingecko.com/coins/images/4128/large/solana.png'
+      },
+      {
+        id: 'polygon-ecosystem-token', symbol: 'POL', name: 'Polygon', color: '#8247E5',
+        logo: 'https://assets.coingecko.com/coins/images/32440/large/polygon.png'
+      },
+    ];
+
+    function PricesPage() {
+      const [prices, setPrices] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+      const [updatedAt, setUpdatedAt] = useState(null);
+
+      const fetchPrices = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const ids = COINS.map(c => c.id).join(',');
+          const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error('Network response was not ok');
+          const data = await res.json();
+          setPrices(data);
+          setUpdatedAt(new Date());
+        } catch (e) {
+          setError(e.message || 'Failed to load prices');
+        } finally {
+          setLoading(false);
+        }
+      }, []);
+
+      useEffect(() => {
+        fetchPrices();
+        const t = setInterval(fetchPrices, 60_000);
+        return () => clearInterval(t);
+      }, [fetchPrices]);
+
+      return (
+        <div className="page-anim">
+          <section className="max-w-7xl mx-auto px-5 md:px-8 pt-16 pb-8">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+              <Reveal>
+                <SectionTitle
+                  eyebrow="Live Market"
+                  title="Crypto prices, right now."
+                  subtitle="Live data from CoinGecko. Auto-refreshes every 60 seconds."
+                />
+              </Reveal>
+
+              <Reveal delay={120}>
+                <div className="flex items-center gap-4">
+                  <div className="hidden sm:flex flex-col items-end leading-tight">
+                    <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500">Last updated</div>
+                    <div className="text-sm text-slate-300 font-mono mt-0.5">
+                      {updatedAt ? updatedAt.toLocaleTimeString() : '—'}
+                    </div>
+                  </div>
+                  <Button onClick={fetchPrices} icon={loading ? undefined : 'refresh-cw'}>
+                    {loading ? <span className="spinner" /> : null}
+                    Refresh
+                  </Button>
+                </div>
+              </Reveal>
+            </div>
+          </section>
+
+          <section className="max-w-7xl mx-auto px-5 md:px-8 pb-12">
+            {error ? (
+              <div className="glass rounded-2xl p-6 border-red-500/40 text-red-300 flex items-center gap-3">
+                <Icon name="triangle-alert" size={18} />
+                <div>
+                  <div className="font-medium text-red-200">Couldn't load prices</div>
+                  <div className="text-sm text-red-300/80">{error} — Try refreshing in a moment.</div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                {COINS.map((coin, i) => {
+                  const data = prices?.[coin.id];
+                  return (
+                    <Reveal key={coin.id} delay={i * 60}>
+                      <CryptoCard coin={coin} data={data} loading={loading && !data} />
+                    </Reveal>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          <section className="max-w-7xl mx-auto px-5 md:px-8">
+            <div className="glass rounded-2xl p-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-slate-400">
+              <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-400"></span> 24h up</div>
+              <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-rose-400"></span> 24h down</div>
+              <div className="flex-1"></div>
+              <div className="font-mono text-xs text-slate-500">Source: api.coingecko.com/v3</div>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    function CryptoCard({ coin, data, loading }) {
+      const price = data?.usd;
+      const change = data?.usd_24h_change;
+      const up = change != null && change >= 0;
+
+      const fmtPrice = (n) => {
+        if (n == null) return '—';
+        if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+        if (n >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+        return n.toLocaleString('en-US', { maximumFractionDigits: 6 });
+      };
+
+      return (
+        <div className="glass card-hover rounded-2xl p-5 relative overflow-hidden">
+          <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20 pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${coin.color}, transparent 60%)` }} />
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-white/5 border border-white/10 grid place-items-center">
+                <img src={coin.logo} alt={coin.name} className="w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              </div>
+              <div>
+                <div className="text-white font-semibold leading-tight">{coin.name}</div>
+                <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500">{coin.symbol}</div>
+              </div>
+            </div>
+
+            {loading ? (
+              <div className="py-3"><LoadingSpinner /></div>
+            ) : (
+              <>
+                <div className="font-display text-2xl md:text-[1.8rem] font-semibold text-white">
+                  ${fmtPrice(price)}
+                </div>
+                <div className={`mt-2 inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-mono ${up ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'}`}>
+                  <Icon name={up ? 'arrow-up-right' : 'arrow-down-right'} size={12} />
+                  {change != null ? `${up ? '+' : ''}${change.toFixed(2)}%` : '—'}
+                  <span className="text-slate-400/80 ml-1">24h</span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       PAGE 4 — BLOCK SIMULATOR
+       ============================================================ */
+    async function sha256(str) {
+      const buf = new TextEncoder().encode(str);
+      const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    const DIFFICULTY_PREFIX = '00';
+
+    function SimulatorPage() {
+      // Block 1
+      const [b1Data, setB1Data] = useState('Genesis: Alice → Bob, 10 ETH');
+      const [b1PrevHash, setB1PrevHash] = useState('0'.repeat(64));
+      const [b1Nonce, setB1Nonce] = useState(0);
+      const [b1Hash, setB1Hash] = useState('');
+      const [b1Mined, setB1Mined] = useState(false);
+      const [b1Mining, setB1Mining] = useState(false);
+      const [b1Time, setB1Time] = useState(null);
+
+      // Block 2
+      const [b2Data, setB2Data] = useState('Bob → Carol, 4 ETH');
+      const [b2Nonce, setB2Nonce] = useState(0);
+      const [b2Hash, setB2Hash] = useState('');
+      const [b2Mined, setB2Mined] = useState(false);
+      const [b2Mining, setB2Mining] = useState(false);
+      const [b2Time, setB2Time] = useState(null);
+      const [b2RecordedPrev, setB2RecordedPrev] = useState(''); // prevHash captured at mining time
+
+      // Live hash recompute on input change (without mining)
+      useEffect(() => {
+        let cancelled = false;
+        (async () => {
+          const h = await sha256(`${b1PrevHash}|${b1Data}|${b1Nonce}`);
+          if (!cancelled) setB1Hash(h);
+          // re-evaluate mined status
+          if (!cancelled) setB1Mined(h.startsWith(DIFFICULTY_PREFIX) && b1Mined);
+        })();
+        return () => { cancelled = true; };
+      }, [b1Data, b1PrevHash, b1Nonce]);
+
+      useEffect(() => {
+        let cancelled = false;
+        (async () => {
+          const h = await sha256(`${b1Hash}|${b2Data}|${b2Nonce}`);
+          if (!cancelled) setB2Hash(h);
+        })();
+        return () => { cancelled = true; };
+      }, [b2Data, b2Nonce, b1Hash]);
+
+      // chain validity check
+      const chainBroken = b2Mined && b2RecordedPrev && b2RecordedPrev !== b1Hash;
+      const b2ValidNow = b2Mined && !chainBroken && b2Hash.startsWith(DIFFICULTY_PREFIX);
+      const b1ValidNow = b1Mined && b1Hash.startsWith(DIFFICULTY_PREFIX);
+
+      const mineBlock = async (which) => {
+        const prefix = DIFFICULTY_PREFIX;
+        if (which === 1) {
+          setB1Mining(true);
+          const start = performance.now();
+          let nonce = 0;
+          // mine with chunked yields so UI updates
+          const loop = async () => {
+            while (true) {
+              for (let i = 0; i < 1500; i++) {
+                const h = await sha256(`${b1PrevHash}|${b1Data}|${nonce}`);
+                if (h.startsWith(prefix)) {
+                  const t = performance.now() - start;
+                  setB1Nonce(nonce);
+                  setB1Hash(h);
+                  setB1Mined(true);
+                  setB1Time(t);
+                  setB1Mining(false);
+                  return;
+                }
+                nonce++;
+              }
+              setB1Nonce(nonce); // progress
+              await new Promise(r => setTimeout(r, 0));
+            }
+          };
+          loop();
+        } else {
+          setB2Mining(true);
+          const prevAtStart = b1Hash;
+          const start = performance.now();
+          let nonce = 0;
+          const loop = async () => {
+            while (true) {
+              for (let i = 0; i < 1500; i++) {
+                const h = await sha256(`${prevAtStart}|${b2Data}|${nonce}`);
+                if (h.startsWith(prefix)) {
+                  const t = performance.now() - start;
+                  setB2Nonce(nonce);
+                  setB2Hash(h);
+                  setB2Mined(true);
+                  setB2Time(t);
+                  setB2RecordedPrev(prevAtStart);
+                  setB2Mining(false);
+                  return;
+                }
+                nonce++;
+              }
+              setB2Nonce(nonce);
+              await new Promise(r => setTimeout(r, 0));
+            }
+          };
+          loop();
+        }
+      };
+
+      const resetAll = () => {
+        setB1Data('Genesis: Alice → Bob, 10 ETH');
+        setB1PrevHash('0'.repeat(64));
+        setB1Nonce(0); setB1Mined(false); setB1Time(null);
+        setB2Data('Bob → Carol, 4 ETH');
+        setB2Nonce(0); setB2Mined(false); setB2Time(null); setB2RecordedPrev('');
+      };
+
+      return (
+        <div className="page-anim">
+          <section className="max-w-7xl mx-auto px-5 md:px-8 pt-16 pb-8">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <Reveal>
+                <SectionTitle
+                  eyebrow="Mine a Block"
+                  title="Proof-of-Work, in your browser."
+                  subtitle={`Real SHA-256. Increment the nonce until the hash begins with "${DIFFICULTY_PREFIX}". Then tamper with Block 1 and watch the chain break.`}
+                />
+              </Reveal>
+              <Reveal delay={100}>
+                <div className="flex items-center gap-3">
+                  <div className="glass rounded-xl px-4 py-2 font-mono text-xs text-slate-300">
+                    Difficulty: <span className="text-cyan2-400">hash starts with "{DIFFICULTY_PREFIX}"</span>
+                  </div>
+                  <Button variant="ghost" onClick={resetAll} icon="rotate-ccw">Reset</Button>
+                </div>
+              </Reveal>
+            </div>
+          </section>
+
+          {/* Chain status banner */}
+          <section className="max-w-7xl mx-auto px-5 md:px-8 pb-6">
+            <Reveal>
+              <ChainStatusBanner
+                b1Mined={b1Mined} b1Valid={b1ValidNow}
+                b2Mined={b2Mined} b2Valid={b2ValidNow}
+                broken={chainBroken}
+              />
+            </Reveal>
+          </section>
+
+          <section className="max-w-7xl mx-auto px-5 md:px-8 pb-12">
+            <div className="grid lg:grid-cols-[1fr_auto_1fr] gap-6 items-stretch">
+              <BlockCard
+                index={1}
+                data={b1Data} setData={setB1Data}
+                prevHash={b1PrevHash} setPrevHash={setB1PrevHash} prevEditable
+                nonce={b1Nonce}
+                hash={b1Hash}
+                mined={b1Mined} mining={b1Mining}
+                valid={b1ValidNow}
+                time={b1Time}
+                onMine={() => mineBlock(1)}
+              />
+
+              <ChainArrow broken={chainBroken} />
+
+              <BlockCard
+                index={2}
+                data={b2Data} setData={setB2Data}
+                prevHash={b1Hash} prevEditable={false}
+                nonce={b2Nonce}
+                hash={b2Hash}
+                mined={b2Mined} mining={b2Mining}
+                valid={b2ValidNow}
+                time={b2Time}
+                onMine={() => mineBlock(2)}
+                disabled={!b1Mined}
+                broken={chainBroken}
+                recordedPrev={b2RecordedPrev}
+              />
+            </div>
+          </section>
+
+          <section className="max-w-7xl mx-auto px-5 md:px-8 pb-20">
+            <Reveal>
+              <div className="glass-strong rounded-3xl p-6 md:p-8 relative overflow-hidden">
+                <div className="absolute -top-10 -left-10 w-80 h-80 rounded-full opacity-20 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, #22D3EE, transparent 60%)' }} />
+                <div className="relative grid md:grid-cols-[auto_1fr] gap-6 items-start">
+                  <div className="w-12 h-12 rounded-2xl grid place-items-center"
+                    style={{ background: 'linear-gradient(135deg,#28A0F0,#06B6D4)' }}>
+                    <Icon name="link-2" size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-2xl font-semibold text-white">Why this matters — immutability</h3>
+                    <p className="text-slate-400 mt-2 leading-relaxed">
+                      Each block embeds the previous block's hash. Change one character in Block 1 and its hash flips entirely — which means Block 2's stored
+                      "previous hash" no longer matches, and the chain breaks. To rewrite history, an attacker would need to re-mine every subsequent block
+                      faster than the rest of the network combined. That's the cryptographic guarantee behind Ethereum's security — and the trust Arbitrum inherits.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          </section>
+        </div>
+      );
+    }
+
+    function ChainStatusBanner({ b1Mined, b1Valid, b2Mined, b2Valid, broken }) {
+      let state, color, icon, msg;
+      if (broken) {
+        state = 'BROKEN'; color = '#F43F5E'; icon = 'unlink'; msg = 'Chain broken — Block 1 was modified after Block 2 was mined.';
+      } else if (b1Valid && b2Valid) {
+        state = 'VALID'; color = '#22C55E'; icon = 'shield-check'; msg = 'Chain valid — both blocks mined and linked.';
+      } else if (b1Valid && !b2Mined) {
+        state = 'PARTIAL'; color = '#22D3EE'; icon = 'circle-dot'; msg = 'Block 1 mined. Mine Block 2 to complete the chain.';
+      } else {
+        state = 'EMPTY'; color = '#94A3B8'; icon = 'circle'; msg = 'No blocks mined yet. Start with Block 1.';
+      }
+
+      return (
+        <div className="glass rounded-2xl px-5 py-4 flex items-center gap-4 border" style={{ borderColor: `${color}55` }}>
+          <div className="w-10 h-10 rounded-xl grid place-items-center flex-shrink-0"
+            style={{ background: `${color}1f`, color, border: `1px solid ${color}55` }}>
+            <Icon name={icon} size={18} />
+          </div>
+          <div className="flex-1">
+            <div className="font-mono text-[10px] uppercase tracking-widest" style={{ color }}>Chain status · {state}</div>
+            <div className="text-white text-sm md:text-base">{msg}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function ChainArrow({ broken }) {
+      return (
+        <div className="hidden lg:flex flex-col items-center justify-center w-20">
+          <svg width="80" height="120" viewBox="0 0 80 120">
+            <defs>
+              <linearGradient id="arrowG" x1="0" x2="1">
+                <stop offset="0%" stopColor={broken ? '#F43F5E' : '#28A0F0'} />
+                <stop offset="100%" stopColor={broken ? '#F43F5E' : '#22D3EE'} />
+              </linearGradient>
+            </defs>
+            {broken ? (
+              <>
+                <line x1="0" y1="60" x2="30" y2="60" stroke="url(#arrowG)" strokeWidth="3" strokeLinecap="round" />
+                <line x1="50" y1="60" x2="80" y2="60" stroke="url(#arrowG)" strokeWidth="3" strokeLinecap="round" />
+                <path d="M30 50 L50 70 M30 70 L50 50" stroke="#F43F5E" strokeWidth="3" strokeLinecap="round" />
+                <text x="40" y="100" textAnchor="middle" fontSize="10" fill="#F43F5E" fontFamily="JetBrains Mono">BROKEN</text>
+              </>
+            ) : (
+              <>
+                <line x1="0" y1="60" x2="68" y2="60" stroke="url(#arrowG)" strokeWidth="3" strokeDasharray="4 5" strokeLinecap="round" className="chain-line" />
+                <path d="M68 52 L80 60 L68 68" fill="url(#arrowG)" />
+                <text x="40" y="92" textAnchor="middle" fontSize="9" fill="#94A3B8" fontFamily="JetBrains Mono">PREV HASH</text>
+              </>
+            )}
+          </svg>
+        </div>
+      );
+    }
+
+    function BlockCard({ index, data, setData, prevHash, setPrevHash, prevEditable,
+      nonce, hash, mined, mining, valid, time, onMine, disabled, broken, recordedPrev }) {
+      const validHash = hash && hash.startsWith(DIFFICULTY_PREFIX);
+      const status = broken ? 'broken' : (mined && validHash ? 'valid' : (mining ? 'mining' : 'idle'));
+      const accent = status === 'broken' ? '#F43F5E' : status === 'valid' ? '#22C55E' : status === 'mining' ? '#22D3EE' : '#94A3B8';
+
+      return (
+        <div className="glass rounded-3xl p-6 md:p-7 relative overflow-hidden flex flex-col">
+          <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-20 pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${accent}, transparent 60%)` }} />
+          <div className="relative flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl grid place-items-center font-display font-bold text-white text-lg"
+                  style={{ background: 'linear-gradient(135deg,#28A0F0,#06B6D4)' }}>
+                  #{index}
+                </div>
+                <div>
+                  <div className="font-display text-lg font-semibold text-white">Block {index}</div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500">
+                    {index === 1 ? 'Genesis' : 'Linked to #1'}
+                  </div>
+                </div>
+              </div>
+              <StatusBadge status={status} />
+            </div>
+
+            {/* Inputs */}
+            <div className="space-y-4">
+              <Field label="Block Data">
+                <textarea
+                  value={data}
+                  onChange={(e) => setData(e.target.value)}
+                  rows={2}
+                  className="w-full bg-ink-900/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono resize-none focus:outline-none focus:border-cyan2-500/60 focus:ring-2 focus:ring-cyan2-500/20"
+                />
+              </Field>
+
+              <Field label="Previous Hash" hint={prevEditable ? 'editable' : 'auto from Block 1'}>
+                {prevEditable ? (
+                  <input
+                    value={prevHash}
+                    onChange={(e) => setPrevHash(e.target.value)}
+                    className="w-full bg-ink-900/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-300 font-mono focus:outline-none focus:border-cyan2-500/60 focus:ring-2 focus:ring-cyan2-500/20"
+                  />
+                ) : (
+                  <div className="rounded-xl px-3.5 py-2.5 text-xs font-mono break-all border"
+                    style={{
+                      background: broken ? 'rgba(244,63,94,0.1)' : 'rgba(255,255,255,0.03)',
+                      borderColor: broken ? 'rgba(244,63,94,0.4)' : 'rgba(255,255,255,0.1)',
+                      color: broken ? '#FCA5A5' : '#CBD5E1'
+                    }}>
+                    {prevHash || '—'}
+                    {recordedPrev && broken && (
+                      <div className="mt-2 pt-2 border-t border-rose-500/30 text-[10px] text-rose-300">
+                        <span className="uppercase tracking-widest">stored at mining:</span> {recordedPrev.slice(0, 32)}…
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Field>
+
+              <Field label="Nonce">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    value={nonce}
+                    onChange={(e) => {
+                      // editing nonce manually invalidates mined state
+                    }}
+                    readOnly
+                    className="w-full bg-ink-900/60 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none"
+                  />
+                  {mining && <span className="spinner flex-shrink-0" />}
+                </div>
+              </Field>
+            </div>
+
+            {/* Hash output */}
+            <div className="mt-5">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-1.5">Hash (SHA-256)</div>
+              <div className="rounded-xl px-3.5 py-3 text-xs font-mono break-all border"
+                style={{
+                  background: validHash ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.03)',
+                  borderColor: validHash ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.1)',
+                  color: validHash ? '#86EFAC' : '#CBD5E1',
+                }}>
+                <span style={{ color: validHash ? '#22C55E' : '#22D3EE', fontWeight: 600 }}>{hash.slice(0, DIFFICULTY_PREFIX.length)}</span>
+                {hash.slice(DIFFICULTY_PREFIX.length) || '—'}
+              </div>
+            </div>
+
+            {/* Stats */}
+            {mined && (
+              <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                <div className="rounded-lg px-3 py-2 bg-white/5 border border-white/10">
+                  <div className="text-slate-500 text-[10px] uppercase font-mono tracking-widest">Mining time</div>
+                  <div className="text-white font-mono mt-0.5">{time ? `${(time / 1000).toFixed(2)}s` : '—'}</div>
+                </div>
+                <div className="rounded-lg px-3 py-2 bg-white/5 border border-white/10">
+                  <div className="text-slate-500 text-[10px] uppercase font-mono tracking-widest">Attempts</div>
+                  <div className="text-white font-mono mt-0.5">{nonce.toLocaleString()}</div>
+                </div>
+              </div>
+            )}
+
+            {/* Mine button */}
+            <div className="mt-6 flex items-center gap-3">
+              <Button
+                onClick={onMine}
+                variant={mined && !broken ? 'ghost' : 'primary'}
+                icon={mining ? undefined : (mined && !broken ? 'refresh-cw' : 'pickaxe')}
+                className={disabled ? 'opacity-50 pointer-events-none' : ''}
+              >
+                {mining ? (<><span className="spinner mr-1" /> Mining…</>) : (mined && !broken ? 'Re-mine' : `Mine Block ${index}`)}
+              </Button>
+              {disabled && (
+                <span className="text-xs text-slate-500 font-mono">Mine Block 1 first</span>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Field({ label, hint, children }) {
+      return (
+        <label className="block">
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500">{label}</div>
+            {hint && <div className="text-[10px] font-mono text-slate-600">{hint}</div>}
+          </div>
+          {children}
+        </label>
+      );
+    }
+
+    function StatusBadge({ status }) {
+      const map = {
+        valid: { c: '#22C55E', bg: 'rgba(34,197,94,0.12)', t: 'VALID', icon: 'check' },
+        broken: { c: '#F43F5E', bg: 'rgba(244,63,94,0.12)', t: 'INVALID', icon: 'x' },
+        mining: { c: '#22D3EE', bg: 'rgba(34,211,238,0.12)', t: 'MINING', icon: 'cpu' },
+        idle: { c: '#94A3B8', bg: 'rgba(148,163,184,0.12)', t: 'UNMINED', icon: 'circle' },
+      };
+      const m = map[status];
+      return (
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-mono text-[10px] uppercase tracking-widest border"
+          style={{ color: m.c, background: m.bg, borderColor: `${m.c}55` }}>
+          <Icon name={m.icon} size={11} />
+          {m.t}
+        </div>
+      );
+    }
+
+    /* ============================================================
+       APP
+       ============================================================ */
+    function App() {
+      const route = useHashRoute();
+
+      let page;
+      if (route === 'concepts') page = <ConceptsPage />;
+      else if (route === 'prices') page = <PricesPage />;
+      else if (route === 'simulator') page = <SimulatorPage />;
+      else page = <HomePage />;
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          <Navbar route={route} />
+          <main className="flex-1" key={route}>
+            {page}
+          </main>
+          <Footer />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+
+</body>
+
+</html>
