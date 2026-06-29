@@ -86,7 +86,10 @@ Concepts
 <img width="1912" height="970" alt="concepts" src="https://github.com/user-attachments/assets/2af6bd1f-96f8-46ec-839e-87b01d1b439c" />
 
 Live prices
+<img width="1897" height="952" alt="prices" src="https://github.com/user-attachments/assets/a7490236-05df-4c9e-ab66-ad9891c392ed" />
 
+Simulators
+<img width="1877" height="745" alt="simulator" src="https://github.com/user-attachments/assets/dad0df4b-5a0c-4f18-ac9d-548cf6f783f9" />
 
 
 
