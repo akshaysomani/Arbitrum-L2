@@ -79,4 +79,16 @@ npx serve .
 
 ## 📸 Preview Screenshots
 
+Home Page
+<img width="1907" height="972" alt="home" src="https://github.com/user-attachments/assets/53e3d78f-f4af-4c89-9dc1-9884d6ea6448" />
+
+Concepts
+<img width="1912" height="970" alt="concepts" src="https://github.com/user-attachments/assets/2af6bd1f-96f8-46ec-839e-87b01d1b439c" />
+
+Live prices
+
+
+
+
+
 Refer to the [screenshots/](file:///c:/Users/Akshay/OneDrive/Desktop/project/screenshots) folder to see previews of the interface, including the Live Market dashboard and the interactive Block Simulator.
