@@ -44,8 +44,8 @@ Designed with a sleek, futuristic dark mode aesthetic, this application acts as 
 ## 📂 Project Structure
 
 ```text
-├── Arbitrum L2 Site.html              # Core single-page application
-├── Arbitrum L2 Site.html.srcmap.json  # Dev source map
+├── index.html              # Core single-page application
+├── index.html.srcmap.json  # Dev source map
 ├── README.md                           # Documentation
 └── screenshots/                        # Captured states of the UI
     ├── home.jpg                        # Homepage screen
@@ -59,7 +59,7 @@ Designed with a sleek, futuristic dark mode aesthetic, this application acts as 
 Because this project is built using browser CDNs, it requires zero build steps or local package installations. You can run it instantly.
 
 ### Option A: Local Browser
-Double-click [Arbitrum L2 Site.html](file:///c:/Users/Akshay/OneDrive/Desktop/project/Arbitrum%20L2%20Site.html) to open the file directly in any modern web browser.
+Double-click `index.html` to open the file directly in any modern web browser.
 
 ### Option B: Local HTTP Server (Recommended)
 To run with correct network routes and prevent potential CORS issues with browser APIs, host it locally using a simple HTTP server:
@@ -68,7 +68,7 @@ To run with correct network routes and prevent potential CORS issues with browse
 ```bash
 python -m http.server 8000
 ```
-Then visit `http://localhost:8000/Arbitrum L2 Site.html` in your browser.
+Then visit `http://localhost:8000/index.html` in your browser.
 
 **Using Node.js (`npx`):**
 ```bash
